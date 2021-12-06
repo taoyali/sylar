@@ -1,0 +1,91 @@
+# sylar
+
+
+
+## 开发环境
+	Centos7
+	gcc9.1
+	cmake
+
+
+
+## 项目路径
+	bin	二进制
+	build	编译中间文件
+	cmake	cmake函数文件夹
+	CMakeLists.txt	cmake的定义文件
+	lib	库的输出文件路径
+	Makefile
+	sylar	源代码
+	tests 	测试代码
+
+
+	
+## 日志系统
+
+1）
+	Log4J: 定义日志类别
+		|
+		|  ---- Formatter：日志格式
+        	| 
+    	Appender: 日志输出地方
+
+
+
+
+
+
+## 协程库封装
+
+
+
+
+
+
+
+## socket函数库
+
+
+
+
+
+
+
+
+## http协议开发
+
+
+
+
+
+
+
+
+## 分布协议
+
+
+
+
+
+
+
+
+
+## 推荐系统
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
