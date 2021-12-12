@@ -1,0 +1,4 @@
+/Users/taoyali/taoyali/project/C++/sylar/build/CMakeFiles/rebuild_cache.dir
+/Users/taoyali/taoyali/project/C++/sylar/build/CMakeFiles/edit_cache.dir
+/Users/taoyali/taoyali/project/C++/sylar/build/CMakeFiles/test.dir
+/Users/taoyali/taoyali/project/C++/sylar/build/CMakeFiles/sylar.dir

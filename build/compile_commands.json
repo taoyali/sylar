@@ -1,0 +1,12 @@
+[
+{
+  "directory": "/Users/taoyali/taoyali/project/C++/sylar/build",
+  "command": "/usr/bin/clang++ -Dsylar_EXPORTS   -rdynamic -O3 -fPIC -ggdb -std=c++11 -Wall -Wno-deprecated -Werror -Wno-unused-function -Wno-builtin-macro-redefined -Wno-deprecated-declarations -g -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.0.sdk -fPIC -o CMakeFiles/sylar.dir/sylar/log.cc.o -c /Users/taoyali/taoyali/project/C++/sylar/sylar/log.cc",
+  "file": "/Users/taoyali/taoyali/project/C++/sylar/sylar/log.cc"
+},
+{
+  "directory": "/Users/taoyali/taoyali/project/C++/sylar/build",
+  "command": "/usr/bin/clang++    -rdynamic -O3 -fPIC -ggdb -std=c++11 -Wall -Wno-deprecated -Werror -Wno-unused-function -Wno-builtin-macro-redefined -Wno-deprecated-declarations -g -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.0.sdk -o CMakeFiles/test.dir/tests/test.cc.o -c /Users/taoyali/taoyali/project/C++/sylar/tests/test.cc",
+  "file": "/Users/taoyali/taoyali/project/C++/sylar/tests/test.cc"
+}
+]
