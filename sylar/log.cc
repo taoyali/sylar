@@ -270,30 +270,94 @@ void Logger::setFormatter(const std::string &val) {
 
 
 
-# change this boy!!!
+std::string Logger::toYamlString() {
+  MutexType::Lock lock(m_mutex);
+  YAML::Node node;
+  node["name"] = m_name;
+  if (m_level != LogLevel::UNKNOW)
+  {
+    node["level"] = LogLevel::ToString(m_level);
+  }
+  if (m_formatter)
+  {
+    node["formatter"] = m_formatter->getPattern();
+  }
+  for (auto &i : m_appenders)
+  {
+    node["appenders"].push_back(YAML::Load(i->toYamlString()));
+  }
+   
+  std::stringstream ss;
+  ss << node;
+  return ss.str();
+}
 
-
-
-
+LogFormatter::ptr Logger::getFormatter() {
+  MutexType::Lock lock(m_mutex);
+  return m_formatter;
+}
 
 void Logger::addAppender(LogAppender::ptr appender) {
-  m_appenders.push_back(appender);
-};
+  MutexType::Lock lock(m_mutex);
+  if (!appender->getFommater())
+  {
+    MutexType::Lock ll(appender->m_mutex);
+    appender->m_formatter = m_formatter;
+  }
+ m_appenders.push_back(appender); 
+}
 
 void Logger::delAppender(LogAppender::ptr appender) {
-  for (it = m_appenders.begin(); it != m_appenders.end(); ++it) {
-    if (*it == appender) {
-      m_appenders.erase(appender);
+  MutexType::Lock lock(m_mutex);
+  for (auto it = m_appenders.begin(); it != m_appenders.end; ++it)
+  {
+    if (*it == appender)
+    {
+      m_appenders.erase(it);
       break;
     }
   }
-};
+}
+
+void Logger::clearAppenders() {
+  MutexType::Lock lock(m_mutex);
+  m_appenders.clear();
+}
+
+
+void Logger::log(LogLevel::Level level, LogEvent::ptr event) {
+  if (level >= m_level)
+  {
+    auto self = shared_from_this();
+    MutexType::Lock lock(m_mutex);
+    if (!m_appenders.empty())
+    {
+      for (auto &i : m_appenders)
+      {
+        i->log(self, level, event);
+      }
+    } else if (m_root)
+    {
+      m_root->log(level, event);
+    }
+  }
+}
+
+
+
 
 void Logger::log(LogLevel::Level level, LogEvent::ptr event) {
   if (level >= m_level) {
     auto self = shared_from_this();
-    for (auto &i = m_appenders) {
-      i->log(self, level, event);
+    MutexType::Lock lock(m_mutex);
+    if (!m_appenders.empty)_)
+    {
+      for (auto &i = m_appenders) {
+        i->log(self, level, event);
+      }
+    } else if (m_root)
+    {
+     m_root->log(level, event);
     }
   }
 };
@@ -307,33 +371,86 @@ void Logger::warn(LogEvent::ptr event) { log(LogLevel::WARN, event); };
 void Logger::fatal(LogEvent::ptr event) { log(LogLevel::FATAL, event); };
 
 FileLogAppender::FileLogAppender(const std::string &filename)
-    : m_filename(filename) {}
+    : m_filename(filename) {
+      reopen();
+    }
 
 void FileLogAppender::log(Logger::ptr logger, LogLevel::Level level,
                           LogEvent::ptr event) {
   if (level >= m_level) {
-    std::out << m_formatter->format(logger, level, event);
+    uint64_t now = event->getTime();
+    if (now >= (m_lastTime + 3))
+    {
+      reopen();
+      m_lastTime = now;
+    }
+    MutexType::Lock lock(m_mutex);
+    if (!m_formatter->format(m_filestream, logger, level, event))
+    {
+      std::count << "error" << std::endl;
+    }
   }
 }
 
+std::string FileLogAppender::toYamlString() {
+  MutexType::Lock lock(m_mutex);
+  YAML::Node node;
+  node["type"] = "FileLogAppender";
+  node["file"] = m_filename;
+  if (m_level != LogLevel::UNKNOW)
+  {
+    node["level"] = LogLevel::ToString(m_level);
+  }
+  if (m_harFormatter && m_formatter)
+  {
+    node["formatter"] = m_formatter->getPattern();
+  }
+  
+  std::stringstream ss;
+  ss << node;
+  return ss.str();
+}
+
 bool FileLogAppender::reopen() {
+  MutexType::Lock lock(m_mutex);
   if (m_filestream) {
     m_filestream.close();
   }
-  m_filestream.open(m_filename);
-  return !!m_filestream;
+  return FSUtil::OpenForWrite(m_filestream, m_filename, std::ios::app); 
 }
 
 void StdoutLogAppender::log(Logger::ptr logger, LogLevel::Level level,
                             LogEvent::ptr event) {
   if (level >= m_level) {
-    std::cout << m_formatter->format(logger, level, event);
+    MutexType::Lock lock(m_mutex);
+    m_formatter->format(std::cout, logger, level, event);
   }
 }
 
-LogFormatter::LogFormatter(const std::string &pattern) : m_pattern(pattern) {}
+std::string StdoutLogAppender::toYamlString() {
+  MutexType::Lock lock(m_mutex);
+  YAML::Node node;
+  node["type"] = "StdoutLogAppender";
+  if (m_level != LogLevel::UNKNOW)
+  {
+    node["level"] = LogLevel::ToString(m_level);
+  }
+  if (m_hasFormatter && m_formatter)
+  {
+    node["formatter"] = m_formatter->getPattern();
+  }
+  std::stringstream ss;
+  ss << node;
+  return ss.str();
+}
 
-std::string LogFormatter::format(std::shared_ptr<Logger> logger,
+
+LogFormatter::LogFormatter(const std::string &pattern) : m_pattern(pattern) {
+  init();
+}
+
+
+std::string LogFormatter::format(Logger::ptr logger,
                                  LogLevel::Level level, LogEvent::ptr event) {
   std::stringstream ss;
   for (auto &i : m_items) {
@@ -461,5 +578,7 @@ void LogFormatter::init() {
 }
 
 // std::string format(LogEvent::ptr event);
+
+// change this here, boy!!!
 
 } // namespace sylar
