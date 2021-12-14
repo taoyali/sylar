@@ -490,7 +490,7 @@ class LoggerManager {
 
  private:
   MutexType m_mutex;
-  std::map<std::string, Logger::ptr> m_logger;
+  std::map<std::string, Logger::ptr> m_loggers;
   Logger::ptr m_root;
 };
 
